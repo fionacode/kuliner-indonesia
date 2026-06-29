@@ -672,9 +672,15 @@ body {
 /* ==========================================
    MAIN GAME LAYOUT (SIDEBAR TO RIGHT)
    ========================================== */
+.game-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .main-game-layout {
   display: flex;
   min-height: 100vh;
+  min-width: 1020px;
 }
 
 .board-area {
@@ -2266,26 +2272,7 @@ button:active:not(:disabled),
   transform: scale(0.98);
 }
 
-/* ==========================================
-   RESPONSIVE DESIGN ADAPTATIONS
-   ========================================== */
-@media (max-width: 1024px) {
-  .main-game-layout {
-    flex-direction: column-reverse;
-  }
-  .sidebar-container {
-    width: 100%;
-    height: auto;
-    position: relative;
-    border-left: none;
-    border-top: var(--border-style);
-    overflow-y: visible;
-  }
-  .board-area {
-    max-width: 100%;
-    padding: 1rem;
-  }
-}
+
 
 /* ==========================================
    SPESIFIK WARNA JUDUL & LEGENDA PER TEMA
