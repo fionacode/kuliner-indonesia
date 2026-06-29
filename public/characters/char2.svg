@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Definition of gradients and filters -->
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#caf0f8" />
+      <stop offset="100%" stop-color="#90e0ef" />
+    </radialGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background circular badge -->
+  <circle cx="50" cy="50" r="46" fill="url(#bgGrad)" stroke="#0077b6" stroke-width="3" filter="url(#shadow)" />
+
+  <!-- Body/Chef Coat -->
+  <path d="M 30,85 C 30,72 70,72 70,85 Z" fill="#ffffff" stroke="#0077b6" stroke-width="2" />
+  <!-- Coat collar and buttons -->
+  <path d="M 45,70 L 45,85" stroke="#0096c7" stroke-width="1.5" />
+  <circle cx="53" cy="75" r="2" fill="#0077b6" />
+  <circle cx="53" cy="81" r="2" fill="#0077b6" />
+  <!-- Blue apron strap -->
+  <path d="M 30,85 C 40,80 60,80 70,85" fill="none" stroke="#0096c7" stroke-width="3" />
+
+  <!-- Neck -->
+  <rect x="45" y="65" width="10" height="10" rx="2" fill="#ffe0b2" stroke="#e6a15c" stroke-width="1.5" />
+
+  <!-- Face -->
+  <circle cx="50" cy="50" r="22" fill="#ffe0b2" stroke="#e6a15c" stroke-width="1.5" />
+
+  <!-- Cheeks (Blush) -->
+  <circle cx="36" cy="54" r="3.5" fill="#ffb7b2" opacity="0.6" />
+  <circle cx="64" cy="54" r="3.5" fill="#ffb7b2" opacity="0.6" />
+
+  <!-- Eyes -->
+  <circle cx="42" cy="48" r="3.5" fill="#1d3557" />
+  <circle cx="43" cy="46.5" r="1.2" fill="#ffffff" />
+  <circle cx="58" cy="48" r="3.5" fill="#1d3557" />
+  <circle cx="59" cy="46.5" r="1.2" fill="#ffffff" />
+
+  <!-- Eyebrows -->
+  <path d="M 37,42 Q 42,40 45,43" fill="none" stroke="#6d4c41" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M 63,42 Q 58,40 55,43" fill="none" stroke="#6d4c41" stroke-width="1.5" stroke-linecap="round" />
+
+  <!-- Smile -->
+  <path d="M 44,56 Q 50,62 56,56" fill="none" stroke="#0077b6" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Chef Hat -->
+  <!-- Puffy top of the chef hat -->
+  <path d="M 28,30 C 20,15 35,5 50,15 C 65,5 80,15 72,30 Z" fill="#ffffff" stroke="#0077b6" stroke-width="2" />
+  <path d="M 36,25 C 40,18 45,18 50,22 C 55,18 60,18 64,25" fill="none" stroke="#0096c7" stroke-width="1.5" />
+  <!-- Hat band -->
+  <rect x="33" y="27" width="34" height="7" rx="1.5" fill="#0096c7" stroke="#0077b6" stroke-width="1.5" />
+</svg>

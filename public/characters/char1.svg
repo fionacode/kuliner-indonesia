@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Definition of gradients and filters -->
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffccd5" />
+      <stop offset="100%" stop-color="#ffb3c1" />
+    </radialGradient>
+    <linearGradient id="hatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff5c6a" />
+      <stop offset="100%" stop-color="#e63946" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background circular badge -->
+  <circle cx="50" cy="50" r="46" fill="url(#bgGrad)" stroke="#ff4d6d" stroke-width="3" filter="url(#shadow)" />
+
+  <!-- Body/Shirt -->
+  <path d="M 30,85 C 30,70 70,70 70,85 Z" fill="#e63946" stroke="#c91827" stroke-width="2" />
+  <!-- Explorer collar details -->
+  <path d="M 40,73 L 34,80 L 42,83 Z" fill="#ff708d" />
+  <path d="M 60,73 L 66,80 L 58,83 Z" fill="#ff708d" />
+
+  <!-- Neck -->
+  <rect x="45" y="65" width="10" height="10" rx="2" fill="#ffd1ac" stroke="#e09f6d" stroke-width="1.5" />
+
+  <!-- Face -->
+  <circle cx="50" cy="50" r="22" fill="#ffd1ac" stroke="#e09f6d" stroke-width="1.5" />
+
+  <!-- Cheeks (Blush) -->
+  <circle cx="36" cy="54" r="3.5" fill="#ff85a1" opacity="0.6" />
+  <circle cx="64" cy="54" r="3.5" fill="#ff85a1" opacity="0.6" />
+
+  <!-- Eyes -->
+  <circle cx="42" cy="48" r="3.5" fill="#1d3557" />
+  <circle cx="43" cy="46.5" r="1.2" fill="#ffffff" />
+  <circle cx="58" cy="48" r="3.5" fill="#1d3557" />
+  <circle cx="59" cy="46.5" r="1.2" fill="#ffffff" />
+
+  <!-- Eyebrows -->
+  <path d="M 37,42 Q 42,40 45,43" fill="none" stroke="#6d4c41" stroke-width="1.5" stroke-linecap="round" />
+  <path d="M 63,42 Q 58,40 55,43" fill="none" stroke="#6d4c41" stroke-width="1.5" stroke-linecap="round" />
+
+  <!-- Smile -->
+  <path d="M 44,56 Q 50,62 56,56" fill="none" stroke="#e63946" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Hair (peeking under hat) -->
+  <path d="M 30,42 Q 33,35 40,34 Q 45,34 50,37 Q 55,34 60,34 Q 67,35 70,42" fill="none" stroke="#6d4c41" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Red Safari Explorer Hat -->
+  <!-- Hat top dome -->
+  <path d="M 32,34 C 32,15 68,15 68,34 Z" fill="url(#hatGrad)" stroke="#c91827" stroke-width="2" />
+  <!-- Hat ribbon -->
+  <path d="M 32,32 Q 50,35 68,32 L 68,34 Q 50,37 32,34 Z" fill="#1d3557" />
+  <!-- Hat badge -->
+  <circle cx="50" cy="27" r="4" fill="#ffb703" />
+  <path d="M 50,25 L 51,27 L 53,27 L 51.5,28 L 52,30 L 50,29 L 48,30 L 48.5,28 L 47,27 L 49,27 Z" fill="#ffffff" />
+  <!-- Hat brim -->
+  <ellipse cx="50" cy="36" rx="24" ry="4" fill="url(#hatGrad)" stroke="#c91827" stroke-width="2" />
+</svg>
