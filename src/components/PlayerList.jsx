@@ -30,7 +30,12 @@ export default function PlayerList({ players, activePlayerIndex }) {
                   P{player.id}
                 </span>
                 <span className="player-name-label">
-                  <strong>{player.name}</strong> {isActive && <span className="active-badge">Giliran</span>}
+                  <strong>{player.name}</strong>
+                  {player.rank ? (
+                    <span className="rank-badge-pill">Juara {player.rank} {player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : '🏅'}</span>
+                  ) : (
+                    isActive && <span className="active-badge">Giliran</span>
+                  )}
                 </span>
               </div>
               <div className="player-item-details">

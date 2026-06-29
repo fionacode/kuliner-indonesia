@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import audioSystem from '../utils/audioSystem';
+import { boardConfig } from '../data/boardConfig';
 
 export default function QuestionModal({ player, food, question, onAnswer }) {
   const [shuffledOptions, setShuffledOptions] = useState([]);
@@ -142,24 +143,40 @@ export default function QuestionModal({ player, food, question, onAnswer }) {
           </div>
         </div>
 
-        {isSubmitted && (
-          <div className={`answer-feedback ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'} animate-slide-up`}>
-            <div className="feedback-icon">{isCorrect ? '🎉' : '❌'}</div>
-            <div className="feedback-message">
-              {isCorrect ? (
-                <>
-                  <h3>Jawaban Benar!</h3>
-                  <p>Hebat! Anda tetap berada di kotak {food.id}.</p>
-                </>
-              ) : (
-                <>
-                  <h3>Jawaban Salah!</h3>
-                  <p>Sayang sekali. Anda harus kembali ke posisi sebelumnya.</p>
-                </>
-              )}
+        {isSubmitted && (() => {
+          const ladder = boardConfig.ladders.find(l => l.start === food.id);
+          const snake = boardConfig.snakes.find(s => s.start === food.id);
+          return (
+            <div className={`answer-feedback ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'} animate-slide-up`}>
+              <div className="feedback-icon">{isCorrect ? '🎉' : '❌'}</div>
+              <div className="feedback-message">
+                {isCorrect ? (
+                  <>
+                    <h3>Jawaban Benar!</h3>
+                    {ladder ? (
+                      <p>Jawaban benar! Anda naik ke kotak {ladder.end}.</p>
+                    ) : snake ? (
+                      <p>Selamat! Anda berhasil menghindari ular dan tetap berada di kotak {food.id}.</p>
+                    ) : (
+                      <p>Hebat! Anda tetap berada di kotak {food.id}.</p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <h3>Jawaban Salah!</h3>
+                    {ladder ? (
+                      <p>Jawaban salah. Anda gagal menaiki tangga dan tetap berada di kotak {food.id}.</p>
+                    ) : snake ? (
+                      <p>Jawaban salah. Anda tergelincir oleh ular dan turun ke kotak {snake.end}.</p>
+                    ) : (
+                      <p>Sayang sekali. Anda harus kembali ke posisi sebelumnya.</p>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

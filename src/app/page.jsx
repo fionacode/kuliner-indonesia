@@ -26,6 +26,7 @@ export default function Home() {
   const [foodForInfo, setFoodForInfo] = useState(null);
   const [activeQuestion, setActiveQuestion] = useState(null); // { food, question }
   const [winnerPlayer, setWinnerPlayer] = useState(null);
+  const [rankNotification, setRankNotification] = useState(null);
   const [victoryParticles, setVictoryParticles] = useState([]);
   const [boxAskCounts, setBoxAskCounts] = useState({});
 
@@ -169,7 +170,10 @@ export default function Home() {
   const handleAnswerQuestion = (isCorrect) => {
     const activePlayer = players[activePlayerIndex];
     const targetFood = activeQuestion.food;
+    
     let nextPos = targetFood.id;
+    let isLadderClimb = false;
+    let isSnakeSlide = false;
 
     // Immediately close the question modal
     setActiveQuestion(null);
@@ -183,53 +187,14 @@ export default function Home() {
           : p
       ));
 
-      // Check for Snakes & Ladders
+      // Check if there is a ladder starting at targetFood.id
       const ladder = boardConfig.ladders.find(l => l.start === targetFood.id);
-      const snake = boardConfig.snakes.find(s => s.start === targetFood.id);
-
       if (ladder) {
         nextPos = ladder.end;
-      } else if (snake) {
-        nextPos = snake.end;
+        isLadderClimb = true;
       }
-
-      const isSnakeOrLadder = targetFood.id !== nextPos;
-      
-      if (isSnakeOrLadder) {
-        const isLadder = nextPos > targetFood.id;
-        audioSystem.playSFX(isLadder ? 'ladder' : 'snake');
-        
-        // Trigger specific animation flag on the player (climbing or sliding)
-        setPlayers(prev => prev.map(p => 
-          p.id === activePlayer.id 
-            ? { ...p, isClimbing: isLadder, isSliding: !isLadder } 
-            : p
-        ));
-
-        // Shift position immediately in React state (GameBoard will transition left/top over 1.1s)
-        setPlayers(prev => prev.map(p => 
-          p.id === activePlayer.id ? { ...p, position: nextPos } : p
-        ));
-
-        // Wait for slide transition to complete
-        setTimeout(() => {
-          // Clear animation flags
-          setPlayers(prev => prev.map(p => 
-            p.id === activePlayer.id 
-              ? { ...p, isClimbing: false, isSliding: false } 
-              : p
-          ));
-          setIsTokenMoving(false);
-          checkWinAndAdvance(nextPos, activePlayer);
-        }, 1200); // matches slide duration
-      } else {
-        setIsTokenMoving(false);
-        checkWinAndAdvance(nextPos, activePlayer);
-      }
+      // If it's a snake, correct answer avoids sliding and stays at targetFood.id
     } else {
-      // Revert back to original position
-      nextPos = previousPosition;
-
       // Update incorrect stats immediately
       setPlayers(prev => prev.map((p, idx) => 
         idx === activePlayerIndex 
@@ -237,7 +202,51 @@ export default function Home() {
           : p
       ));
 
-      // Animate walking back step-by-step
+      // Check if there is a snake starting at targetFood.id
+      const snake = boardConfig.snakes.find(s => s.start === targetFood.id);
+      const ladder = boardConfig.ladders.find(l => l.start === targetFood.id);
+
+      if (snake) {
+        nextPos = snake.end;
+        isSnakeSlide = true;
+      } else if (ladder) {
+        // Incorrect on ladder -> stay at ladder start (targetFood.id)
+        nextPos = targetFood.id;
+      } else {
+        // Normal square -> go back to previous position
+        nextPos = previousPosition;
+      }
+    }
+
+    // Now decide which animation/movement type to trigger
+    if (isLadderClimb || isSnakeSlide) {
+      audioSystem.playSFX(isLadderClimb ? 'ladder' : 'snake');
+      
+      // Trigger specific animation flag on the player (climbing or sliding)
+      setPlayers(prev => prev.map(p => 
+        p.id === activePlayer.id 
+          ? { ...p, isClimbing: isLadderClimb, isSliding: isSnakeSlide } 
+          : p
+      ));
+
+      // Shift position immediately in React state
+      setPlayers(prev => prev.map(p => 
+        p.id === activePlayer.id ? { ...p, position: nextPos } : p
+      ));
+
+      // Wait for slide transition to complete
+      setTimeout(() => {
+        // Clear animation flags
+        setPlayers(prev => prev.map(p => 
+          p.id === activePlayer.id 
+            ? { ...p, isClimbing: false, isSliding: false } 
+            : p
+        ));
+        setIsTokenMoving(false);
+        checkWinAndAdvance(nextPos, activePlayer);
+      }, 1200);
+    } else if (nextPos === previousPosition) {
+      // Walk back step-by-step
       setPlayers(prev => prev.map(p => 
         p.id === activePlayer.id ? { ...p, isMoving: true } : p
       ));
@@ -252,31 +261,100 @@ export default function Home() {
           checkWinAndAdvance(nextPos, activePlayer);
         });
       }, 200);
+    } else {
+      // Stays where they are (either correct on normal/snake, or incorrect on ladder)
+      setIsTokenMoving(false);
+      checkWinAndAdvance(nextPos, activePlayer);
     }
   };
 
-  const checkWinAndAdvance = (pos, player) => {
+  const advanceTurn = (currentPlayers, skipPlayerId) => {
+    let nextIdx = activePlayerIndex;
+    for (let i = 1; i <= currentPlayers.length; i++) {
+      const idx = (activePlayerIndex + i) % currentPlayers.length;
+      const p = currentPlayers[idx];
+      if (p.id !== skipPlayerId && !p.rank) {
+        nextIdx = idx;
+        break;
+      }
+    }
+    setActivePlayerIndex(nextIdx);
+  };
+
+  const checkWinAndAdvance = (pos, activePlayer) => {
     if (pos === 50) {
-      audioSystem.playSFX('win');
-      setWinnerPlayer(player);
-      setGameState('winner');
+      const rankedCount = players.filter(p => p.rank).length;
+      const assignedRank = rankedCount + 1;
+
+      // Update state for this player
+      setPlayers(prev => prev.map(p => 
+        p.id === activePlayer.id ? { ...p, rank: assignedRank } : p
+      ));
+
+      // Calculate unranked players left
+      const unrankedLeft = players.length - (rankedCount + 1);
+
+      if (unrankedLeft <= 1) {
+        // Game over! Last remaining player gets the last rank
+        setPlayers(prev => prev.map(p => {
+          if (p.id === activePlayer.id) {
+            return { ...p, rank: assignedRank };
+          }
+          if (!p.rank) {
+            return { ...p, rank: players.length };
+          }
+          return p;
+        }));
+
+        audioSystem.playSFX('win');
+        setTimeout(() => {
+          setGameState('winner');
+        }, 800);
+      } else {
+        // Show intermediate rank notification
+        audioSystem.playSFX('win');
+        setRankNotification({
+          playerName: activePlayer.name,
+          color: activePlayer.color,
+          rank: assignedRank
+        });
+
+        // Advance turn now, skipping the current player who just finished
+        advanceTurn(players, activePlayer.id);
+      }
       return;
     }
+
     // Switch turns
-    setActivePlayerIndex(prevIdx => (prevIdx + 1) % players.length);
+    advanceTurn(players);
   };
 
   const handlePlayAgain = () => {
     setGameState('setup');
     setPlayers([]);
-    setWinnerPlayer(null);
+    setActivePlayerIndex(0);
     setDiceValue(null);
+    setIsDiceRolling(false);
+    setIsTokenMoving(false);
+    setPreviousPosition(0);
+    setFoodForInfo(null);
+    setActiveQuestion(null);
+    setWinnerPlayer(null);
+    setRankNotification(null);
+    setBoxAskCounts({});
   };
 
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
     audioSystem.changeTheme(newTheme);
   };
+
+  const handleDismissRankNotification = () => {
+    setRankNotification(null);
+  };
+
+  const rank1Player = players.find(p => p.rank === 1);
+  const sortedRankings = [...players].sort((a, b) => (a.rank || 99) - (b.rank || 99));
 
   return (
     <div className="game-wrapper" data-theme={theme}>
@@ -316,7 +394,7 @@ export default function Home() {
       )}
 
       {/* Winner Screen Popup */}
-      {gameState === 'winner' && winnerPlayer && (
+      {gameState === 'winner' && rank1Player && (
         <div className="modal-overlay winner-overlay">
           {/* Falling Confetti Pieces */}
           <div className="victory-confetti-container">
@@ -343,38 +421,60 @@ export default function Home() {
           <div className="modal-card winner-card animate-pop-in">
             <div className="winner-confetti">🏆👑🥇</div>
             <h2>Selamat untuk Sang Juara!</h2>
-            <h1 className="winner-name" style={{ color: winnerPlayer.color }}>
-              {winnerPlayer.name}
+            <h1 className="winner-name" style={{ color: rank1Player.color }}>
+              {rank1Player.name}
             </h1>
-            <p className="winner-sub">Telah berhasil menjelajah dan mencapai Kotak 50!</p>
-            
-            <div className="winner-stats-grid">
-              <div className="winner-stat-card">
-                <span>Jawaban Benar</span>
-                <strong className="text-success">✅ {winnerPlayer.correctCount}</strong>
-              </div>
-              <div className="winner-stat-card">
-                <span>Jawaban Salah</span>
-                <strong className="text-danger">❌ {winnerPlayer.incorrectCount}</strong>
-              </div>
-              <div className="winner-stat-card">
-                <span>Total Langkah Dadu</span>
-                <strong className="text-primary">🎲 {winnerPlayer.totalSteps}</strong>
-              </div>
-            </div>
+            <p className="winner-sub">Telah berhasil menyelesaikan petualangan kuliner Nusantara!</p>
 
-            <h3 className="stats-comparison-title">Statistik Penjelajah Lain:</h3>
-            <div className="comparison-list">
-              {players.map(p => (
-                <div key={p.id} className="comparison-row" style={{ borderLeftColor: p.color }}>
-                  <span><strong>{p.name}</strong> (Kotak {p.position === 0 ? 'START' : p.position})</span>
-                  <span>Benar: {p.correctCount} | Salah: {p.incorrectCount} | Langkah: {p.totalSteps}</span>
-                </div>
-              ))}
+            <h3 className="stats-comparison-title" style={{ marginTop: '1.5rem' }}>Peringkat Akhir Penjelajah:</h3>
+            <div className="rankings-list">
+              {sortedRankings.map((p, idx) => {
+                const rankEmojis = ['🥇', '🥈', '🥉', '🏅'];
+                const rankLabel = `Juara ${p.rank || (idx + 1)}`;
+                const medal = rankEmojis[(p.rank || (idx + 1)) - 1] || '🏅';
+                return (
+                  <div key={p.id} className="ranking-item-row" style={{ borderLeft: `6px solid ${p.color}` }}>
+                    <div className="ranking-rank-info">
+                      <span className="ranking-medal-icon">{medal}</span>
+                      <span className="ranking-rank-text">{rankLabel}</span>
+                    </div>
+                    <div className="ranking-player-info">
+                      <strong className="ranking-player-name-text" style={{ color: p.color }}>{p.name}</strong>
+                      <div className="ranking-player-stats-text">
+                        Benar: {p.correctCount} | Salah: {p.incorrectCount} | {p.totalSteps} langkah
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <button onClick={handlePlayAgain} className="play-again-btn">
               Main Lagi 🔄
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Intermediate Rank Notification Modal */}
+      {rankNotification && (
+        <div className="modal-overlay rank-notif-overlay">
+          <div className="modal-card rank-notif-card animate-pop-in">
+            <div className="rank-notif-medal">
+              {rankNotification.rank === 1 ? '🥇' : rankNotification.rank === 2 ? '🥈' : rankNotification.rank === 3 ? '🥉' : '🏅'}
+            </div>
+            <h2>Selamat!</h2>
+            <h1 className="rank-notif-player-name" style={{ color: rankNotification.color }}>
+              {rankNotification.playerName}
+            </h1>
+            <p className="rank-notif-sub">
+              Mencapai Kotak 50 dan meraih peringkat <strong>Juara {rankNotification.rank}</strong>!
+            </p>
+            <p className="rank-notif-desc">
+              Pemain lain tetap melanjutkan permainan untuk memperebutkan peringkat selanjutnya.
+            </p>
+            <button onClick={handleDismissRankNotification} className="rank-notif-btn">
+              Lanjutkan Permainan 🚀
             </button>
           </div>
         </div>
