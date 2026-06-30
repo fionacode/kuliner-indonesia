@@ -9,6 +9,7 @@ import QuestionModal from '../components/QuestionModal';
 import { boardConfig } from '../data/boardConfig';
 import { foodData } from '../data/foodData';
 import audioSystem from '../utils/audioSystem';
+import AboutModal from '../components/AboutModal';
 
 export default function Home() {
   // Game states: 'setup' | 'playing' | 'winner'
@@ -29,6 +30,7 @@ export default function Home() {
   const [rankNotification, setRankNotification] = useState(null);
   const [victoryParticles, setVictoryParticles] = useState([]);
   const [boxAskCounts, setBoxAskCounts] = useState({});
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   // Generate victory confetti when game state becomes 'winner'
   useEffect(() => {
@@ -353,44 +355,88 @@ export default function Home() {
     setRankNotification(null);
   };
 
+  const activePlayer = players[activePlayerIndex];
   const rank1Player = players.find(p => p.rank === 1);
   const sortedRankings = [...players].sort((a, b) => (a.rank || 99) - (b.rank || 99));
 
   return (
     <div className="game-wrapper" data-theme={theme}>
       {gameState === 'setup' && (
-        <SetupScreen onStartGame={handleStartGame} />
+        <SetupScreen 
+          onStartGame={handleStartGame} 
+          theme={theme}
+          onThemeChange={handleThemeChange}
+          onAboutClick={() => setIsAboutOpen(true)}
+        />
       )}
 
       {gameState === 'playing' && (
-        <div className="main-game-layout">
-          {/* Main Board Area */}
-          <main className="board-area">
-            <header className="game-board-header">
-              <h1>Jelajah Kuliner Nusantara</h1>
-              <p className="subtitle-adventure">Klik kotak untuk membaca informasi kuliner Nusantara!</p>
-            </header>
+        <>
+          <div className="main-game-layout">
+            {/* Main Board Area */}
+            <main className="board-area">
+              <header className="game-board-header">
+                <h1>Jelajah Kuliner Nusantara</h1>
+                <p className="subtitle-adventure">Klik kotak untuk membaca informasi kuliner Nusantara!</p>
+              </header>
 
-            <GameBoard 
-              players={players} 
+              <GameBoard 
+                players={players} 
+                theme={theme}
+                onCellClick={(food) => setFoodForInfo(food)} 
+              />
+            </main>
+
+            {/* Sidebar Area */}
+            <Sidebar
+              players={players}
+              activePlayerIndex={activePlayerIndex}
+              diceValue={diceValue}
+              isDiceRolling={isDiceRolling}
+              isTokenMoving={isTokenMoving}
+              onRollDice={handleRollDice}
+              isGameStarted={true}
               theme={theme}
-              onCellClick={(food) => setFoodForInfo(food)} 
+              onThemeChange={handleThemeChange}
+              onAboutClick={() => setIsAboutOpen(true)}
             />
-          </main>
+          </div>
 
-          {/* Sidebar Area */}
-          <Sidebar
-            players={players}
-            activePlayerIndex={activePlayerIndex}
-            diceValue={diceValue}
-            isDiceRolling={isDiceRolling}
-            isTokenMoving={isTokenMoving}
-            onRollDice={handleRollDice}
-            isGameStarted={true}
-            theme={theme}
-            onThemeChange={handleThemeChange}
-          />
-        </div>
+          {/* Panel Kontrol Lekat khusus Mobile */}
+          {activePlayer && (
+            <div className="mobile-sticky-control-panel">
+              <div className="mobile-active-player">
+                <span 
+                  className="mobile-color-dot" 
+                  style={{ backgroundColor: activePlayer.color }}
+                />
+                <div className="mobile-player-info">
+                  <span className="mobile-label">Giliran</span>
+                  <strong className="mobile-name">{activePlayer.name}</strong>
+                </div>
+              </div>
+
+              <div className="mobile-dice-section">
+                <span className="mobile-label">Dadu</span>
+                <div className="mobile-dice-value">
+                  {diceValue ? (
+                    <span className="mobile-dice-num">🎲 {diceValue}</span>
+                  ) : (
+                    <span className="mobile-dice-empty">-</span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={handleRollDice}
+                disabled={isDiceRolling || isTokenMoving}
+                className="mobile-roll-btn"
+              >
+                {isDiceRolling ? 'Mengocok...' : isTokenMoving ? 'Bidak...' : 'Lempar 🎲'}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Winner Screen Popup */}
@@ -499,6 +545,13 @@ export default function Home() {
           />
         </div>
       )}
+
+      {/* About Game Modal */}
+      <AboutModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
+        theme={theme}
+      />
     </div>
   );
 }

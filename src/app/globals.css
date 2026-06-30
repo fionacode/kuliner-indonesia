@@ -2345,11 +2345,18 @@ button:active:not(:disabled),
 }
 
 /* ==========================================
+   MOBILE STICKY CONTROL PANEL DEFAULT (DESKTOP)
+   ========================================== */
+.mobile-sticky-control-panel {
+  display: none;
+}
+
+/* ==========================================
    MOBILE PORTRAIT OVERRIDES (max-width: 768px)
    ========================================== */
 @media (max-width: 768px) and (orientation: portrait) {
   :root {
-    --board-scale: calc((100vw - 1.5rem) / 800);
+    --board-scale: calc((100vw - 2rem) / 800);
   }
 
   .game-wrapper {
@@ -2389,7 +2396,7 @@ button:active:not(:disabled),
     min-width: 800px !important;
     transform: scale(var(--board-scale)) !important;
     transform-origin: top center !important;
-    margin-bottom: calc(-430px * (1 - var(--board-scale))) !important;
+    margin-bottom: calc(-410px * (1 - var(--board-scale))) !important;
   }
 
   .sidebar-container {
@@ -2403,6 +2410,156 @@ button:active:not(:disabled),
     border-top: var(--border-style) !important;
     overflow-y: visible !important;
     padding: 1.5rem 1rem !important;
+    padding-bottom: 95px !important; /* Ensure content is scrollable above fixed control panel */
+  }
+
+  /* Compact Board Legend di Mobile */
+  .board-legend {
+    padding: 0.4rem 0.6rem !important;
+    gap: 0.5rem !important;
+    margin-top: 0.25rem !important;
+  }
+  .legend-title {
+    font-size: 0.7rem !important;
+  }
+  .legend-item {
+    font-size: 0.65rem !important;
+    gap: 0.2rem !important;
+  }
+  .legend-color-dot {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  /* Styling Panel Kontrol Mobile */
+  .mobile-sticky-control-panel {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 76px;
+    background: var(--bg-card);
+    border-top: var(--border-style);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    z-index: 90; /* Under modal-overlay (z-index 100) */
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.2rem;
+    backdrop-filter: blur(14px);
+    font-family: var(--font-main);
+    color: var(--text-main);
+  }
+
+  /* Konten Giliran Aktif */
+  .mobile-active-player {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 40%;
+  }
+  .mobile-color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .mobile-player-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .mobile-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .mobile-name {
+    font-size: 0.85rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+  }
+
+  /* Hasil Dadu Terakhir */
+  .mobile-dice-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .mobile-dice-value {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--primary);
+  }
+  .mobile-dice-empty {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  /* Tombol Lempar Dadu */
+  .mobile-roll-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.1rem;
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  .mobile-roll-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Overrides Khusus Tema Retro */
+  [data-theme="retro"] .mobile-sticky-control-panel {
+    border: 3.5px solid #00ff00;
+    border-left: none;
+    border-right: none;
+    background: #000;
+    border-radius: 0;
+    height: 80px;
+    box-shadow: none;
+  }
+  [data-theme="retro"] .mobile-label {
+    font-size: 0.45rem;
+  }
+  [data-theme="retro"] .mobile-name {
+    font-size: 0.5rem;
+  }
+  [data-theme="retro"] .mobile-color-dot {
+    border-radius: 0;
+  }
+  [data-theme="retro"] .mobile-dice-value {
+    font-size: 0.65rem;
+    color: var(--accent);
+  }
+  [data-theme="retro"] .mobile-dice-empty {
+    font-size: 0.5rem;
+  }
+  [data-theme="retro"] .mobile-roll-btn {
+    border-radius: 0;
+    border: 2px solid #F72585;
+    background: #000;
+    color: #FFF8DC;
+    font-size: 0.5rem;
+    box-shadow: none;
+  }
+  [data-theme="retro"] .mobile-roll-btn:hover:not(:disabled) {
+    background: #F72585;
+    color: #000;
+  }
+
+  /* Overrides warna teks dadu khusus Pasar Malam & Retro */
+  [data-theme="pasarmalam"] .mobile-dice-value {
+    color: #F6C453;
   }
 }
 
@@ -2643,4 +2800,314 @@ button:active:not(:disabled),
 }
 [data-theme="pasarmalam"] .rank-notif-btn {
   background: #dc2626;
+}
+
+/* ==========================================
+   ABOUT GAME MODAL STYLING
+   ========================================== */
+.modal-about-overlay {
+  z-index: 105; /* Above mobile sticky panel (z-index 90) but below winner (z-index 120) */
+}
+
+.about-card {
+  max-width: 520px;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.about-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px dashed rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="gelap"] .about-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="retro"] .about-header {
+  border-bottom: 2px dashed #00ff00;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.about-logo {
+  max-width: 130px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.about-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.about-title {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+[data-theme="retro"] .about-title {
+  font-size: 0.8rem;
+}
+
+.about-description-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.about-desc-para {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-main);
+  text-align: justify;
+}
+
+[data-theme="retro"] .about-desc-para {
+  font-size: 0.55rem;
+  line-height: 1.8;
+}
+
+.about-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+[data-theme="gelap"] .about-details-grid {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="retro"] .about-details-grid {
+  border: 2px solid #555;
+  background: #000;
+  border-radius: 0;
+}
+
+.about-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.about-detail-icon {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 50%;
+}
+
+[data-theme="gelap"] .about-detail-icon {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="retro"] .about-detail-icon {
+  border-radius: 0;
+  border: 1px solid #555;
+  background: #000;
+  font-size: 1rem;
+}
+
+.about-detail-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-detail-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.about-detail-value {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+[data-theme="retro"] .about-detail-value {
+  font-size: 0.55rem;
+}
+
+.about-goal-box {
+  background: rgba(255, 127, 80, 0.08);
+  border-left: 4px solid var(--primary);
+  padding: 1rem;
+  border-radius: 0 12px 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+[data-theme="retro"] .about-goal-box {
+  background: #000;
+  border: 2px solid #00ff00;
+  border-left-width: 6px;
+  border-radius: 0;
+}
+
+.about-goal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.about-goal-icon {
+  font-size: 1.1rem;
+}
+
+.about-goal-box h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+[data-theme="retro"] .about-goal-box h3 {
+  color: #00ff00;
+  font-size: 0.55rem;
+}
+
+.about-goal-value {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+[data-theme="retro"] .about-goal-value {
+  font-size: 0.52rem;
+  line-height: 1.8;
+}
+
+.about-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+/* Button style adjustments for setup about button */
+.about-game-trigger-btn {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-main);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 0.4rem 1.1rem;
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="gelap"] .about-game-trigger-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="retro"] .about-game-trigger-btn {
+  border-radius: 0;
+  border: 2px solid #555;
+  background: #000;
+  color: #00ff00;
+  font-size: 0.5rem;
+}
+
+.about-game-trigger-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+[data-theme="retro"] .about-game-trigger-btn:hover {
+  background: #00ff00;
+  color: #000;
+  border-color: #00ff00;
+}
+
+/* Sidebar about button styling */
+.sidebar-about-btn {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text-main);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 0.35rem 0.8rem;
+  font-family: var(--font-main);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="gelap"] .sidebar-about-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="retro"] .sidebar-about-btn {
+  border-radius: 0;
+  border: 2px solid #555;
+  background: #000;
+  color: #00ff00;
+  font-size: 0.45rem;
+}
+
+.sidebar-about-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+[data-theme="retro"] .sidebar-about-btn:hover {
+  background: #00ff00;
+  color: #000;
+  border-color: #00ff00;
+}
+
+/* Overlay fade in keyframes */
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: overlayFadeIn 0.25s ease forwards;
 }

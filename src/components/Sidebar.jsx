@@ -23,7 +23,8 @@ export default function Sidebar({
   onRollDice,
   isGameStarted,
   theme,
-  onThemeChange
+  onThemeChange,
+  onAboutClick
 }) {
   const activePlayer = players[activePlayerIndex];
   const currentBoxNum = activePlayer?.position || 0;
@@ -36,6 +37,13 @@ export default function Sidebar({
       <div className="sidebar-brand">
         <h2>🗺️ Nusantara</h2>
         <span className="brand-badge">Kuliner Adventure</span>
+        <button 
+          type="button" 
+          className="sidebar-about-btn"
+          onClick={onAboutClick}
+        >
+          ℹ️ About Game
+        </button>
       </div>
 
       {/* Dynamic Theme Switcher */}

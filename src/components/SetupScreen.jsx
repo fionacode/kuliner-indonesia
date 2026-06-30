@@ -8,9 +8,8 @@ const characterTemplates = [
   { id: 'char4', name: 'Pemandu', file: '/characters/char4.svg', color: '#e9c46a', label: 'Pemandu Lokal' },
 ];
 
-export default function SetupScreen({ onStartGame }) {
+export default function SetupScreen({ onStartGame, theme, onThemeChange, onAboutClick }) {
   const [numPlayers, setNumPlayers] = useState(2);
-  const [selectedTheme, setSelectedTheme] = useState('terang');
   const [playerNames, setPlayerNames] = useState({
     player1: 'Penjelajah 1',
     player2: 'Penjelajah 2',
@@ -55,9 +54,7 @@ export default function SetupScreen({ onStartGame }) {
   };
 
   const handleThemeSelect = (themeId) => {
-    setSelectedTheme(themeId);
-    // Automatically change the backsound based on theme selection
-    audioSystem.changeTheme(themeId);
+    onThemeChange(themeId);
   };
 
   const handleSubmit = (e) => {
@@ -81,16 +78,23 @@ export default function SetupScreen({ onStartGame }) {
         score: 0
       });
     }
-    onStartGame(playersList, selectedTheme);
+    onStartGame(playersList, theme);
   };
 
   return (
-    <div className="setup-container" data-theme={selectedTheme}>
+    <div className="setup-container" data-theme={theme}>
       <div className="setup-card">
         <div className="setup-header">
           <div className="logo-badge">🍽️ Nusantara</div>
           <h1>Jelajah Kuliner Nusantara</h1>
           <p className="setup-subtitle">Petualangan kuliner Indonesia yang edukatif dan menyenangkan</p>
+          <button 
+            type="button" 
+            className="about-game-trigger-btn"
+            onClick={onAboutClick}
+          >
+            ℹ️ About Game
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="setup-form">
@@ -120,7 +124,7 @@ export default function SetupScreen({ onStartGame }) {
                 <button
                   key={t.id}
                   type="button"
-                  className={`theme-compact-btn ${selectedTheme === t.id ? 'active' : 'inactive'}`}
+                  className={`theme-compact-btn ${theme === t.id ? 'active' : 'inactive'}`}
                   onClick={() => handleThemeSelect(t.id)}
                 >
                   <span className="theme-btn-icon">{t.icon}</span>
